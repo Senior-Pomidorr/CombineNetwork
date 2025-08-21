@@ -22,11 +22,43 @@ final class HTTPClient {
             return Fail(error: APIError.unknown(statusCode: -1, message: "Failed to build URL request"))
                 .eraseToAnyPublisher()
         }
+        print(urlRequest)
+        
+        return URLSession.shared.dataTaskPublisher(for: urlRequest)
+            .tryMap { data, response in
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw APIError.badRequest(statusCode: -1, message: "Invalid response")
+                }
+                switch httpResponse.statusCode {
+                case 400:
+                    throw APIError.badRequest(statusCode: httpResponse.statusCode, message: httpResponse.description)
+                case 401:
+                    throw APIError.unauthorized(statusCode: httpResponse.statusCode, message: httpResponse.description)
+                case 403:
+                    throw APIError.forbidden(statusCode: httpResponse.statusCode, message: httpResponse.description)
+                case 404:
+                    throw APIError.notFound(statusCode: httpResponse.statusCode, message: httpResponse.description)
+                case 500:
+                    throw APIError.internalServerError(statusCode: httpResponse.statusCode, message: httpResponse.description)
+                case 200..<300:
+                    return data
+                default:
+                    throw APIError.unknown(statusCode: httpResponse.statusCode, message: "Request failed with status code \(httpResponse.statusCode)")
+                }
+            }
+            .decode(type: T.self, decoder: JSONDecoder())
+            .mapError({ error in
+                if let apiError = error as? APIError {
+                    return apiError
+                } else {
+                    return APIError.unknown(statusCode: -1, message: error.localizedDescription)
+                }
+            })
+            .eraseToAnyPublisher()
         
         // You will want to implement this part for actual networking.
         // Just a placeholder for now:
-        return Fail(error: APIError.unknown(statusCode: -1, message: "Not implemented"))
-            .eraseToAnyPublisher()
+        
     }
     
      func buildURLRequest(endpoint: APIEndpoint, cachePolicy: URLRequest.CachePolicy? = .some(.useProtocolCachePolicy)) -> URLRequest? {
