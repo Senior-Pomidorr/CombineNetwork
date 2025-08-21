@@ -25,27 +25,7 @@ final class HTTPClient {
         print(urlRequest)
         
         return URLSession.shared.dataTaskPublisher(for: urlRequest)
-            .tryMap { data, response in
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    throw APIError.badRequest(statusCode: -1, message: "Invalid response")
-                }
-                switch httpResponse.statusCode {
-                case 400:
-                    throw APIError.badRequest(statusCode: httpResponse.statusCode, message: httpResponse.description)
-                case 401:
-                    throw APIError.unauthorized(statusCode: httpResponse.statusCode, message: httpResponse.description)
-                case 403:
-                    throw APIError.forbidden(statusCode: httpResponse.statusCode, message: httpResponse.description)
-                case 404:
-                    throw APIError.notFound(statusCode: httpResponse.statusCode, message: httpResponse.description)
-                case 500:
-                    throw APIError.internalServerError(statusCode: httpResponse.statusCode, message: httpResponse.description)
-                case 200..<300:
-                    return data
-                default:
-                    throw APIError.unknown(statusCode: httpResponse.statusCode, message: "Request failed with status code \(httpResponse.statusCode)")
-                }
-            }
+            .validateResponse()
             .decode(type: T.self, decoder: JSONDecoder())
             .mapError({ error in
                 if let apiError = error as? APIError {
@@ -55,10 +35,6 @@ final class HTTPClient {
                 }
             })
             .eraseToAnyPublisher()
-        
-        // You will want to implement this part for actual networking.
-        // Just a placeholder for now:
-        
     }
     
      func buildURLRequest(endpoint: APIEndpoint, cachePolicy: URLRequest.CachePolicy? = .some(.useProtocolCachePolicy)) -> URLRequest? {
@@ -126,5 +102,33 @@ final class HTTPClient {
         
         return queryItems.isEmpty ? nil : queryItems
     }
+}
+
+@available(macOS 10.15, *)
+extension Publisher where Output == (data: Data, response: URLResponse) {
     
+    func validateResponse() -> AnyPublisher<Data, Error> {
+        self.tryMap { data, response in
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw APIError.badRequest(statusCode: -1, message: "Invalid response")
+            }
+            switch httpResponse.statusCode {
+            case 400:
+                throw APIError.badRequest(statusCode: httpResponse.statusCode, message: httpResponse.description)
+            case 401:
+                throw APIError.unauthorized(statusCode: httpResponse.statusCode, message: httpResponse.description)
+            case 403:
+                throw APIError.forbidden(statusCode: httpResponse.statusCode, message: httpResponse.description)
+            case 404:
+                throw APIError.notFound(statusCode: httpResponse.statusCode, message: httpResponse.description)
+            case 500:
+                throw APIError.internalServerError(statusCode: httpResponse.statusCode, message: httpResponse.description)
+            case 200..<300:
+                return data
+            default:
+                throw APIError.unknown(statusCode: httpResponse.statusCode, message: "Request failed with status code \(httpResponse.statusCode)")
+            }
+        }
+        .eraseToAnyPublisher()
+    }
 }
