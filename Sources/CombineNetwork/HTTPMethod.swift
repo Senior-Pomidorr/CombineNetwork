@@ -17,3 +17,9 @@ public enum HTTPMethod: String {
     case connect = "CONNECT"
 }
 
+public enum HTTPProtocol: String {
+    case https = "https"
+    case http = "http"
+}
+
+
