@@ -5,7 +5,7 @@
 //  Created by Daniil Kulikovskiy on 21.08.2025.
 //
 
-enum ContentType {
+public enum ContentType {
     case json
     case jsonPatch
     case formURLEncoded

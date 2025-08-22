@@ -5,7 +5,7 @@
 //  Created by Daniil Kulikovskiy on 21.08.2025.
 //
 
-protocol APIEndpoint {
+public protocol APIEndpoint {
     var scheme: String { get }
     var host: String { get }
     var path: String { get }

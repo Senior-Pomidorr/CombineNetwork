@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum APIError: Error, LocalizedError {
+public enum APIError: Error, LocalizedError {
     case badRequest(statusCode: Int, message: String)
     case unauthorized(statusCode: Int, message: String)
     case forbidden(statusCode: Int, message: String)
