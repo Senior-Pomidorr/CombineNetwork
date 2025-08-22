@@ -6,7 +6,7 @@
 //
 
 public protocol APIEndpoint {
-    var scheme: HTTPProtocol.RawValue { get }
+    var scheme: HTTPProtocol { get }
     var host: String { get }
     var path: String { get }
     var method: HTTPMethod { get }

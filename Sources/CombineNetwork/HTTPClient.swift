@@ -39,7 +39,7 @@ public final class HTTPClient {
     
      func buildURLRequest(endpoint: APIEndpoint, cachePolicy: URLRequest.CachePolicy? = .some(.useProtocolCachePolicy)) -> URLRequest? {
         var components = URLComponents()
-        components.scheme = endpoint.scheme
+         components.scheme = endpoint.scheme.rawValue
         components.host = endpoint.host
         components.path = endpoint.path
         
