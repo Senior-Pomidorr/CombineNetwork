@@ -16,7 +16,7 @@ public final class HTTPClient {
     
     // MARK: - Request
     @available(macOS 10.15, *)
-    func request<T: Codable>(endpoint: APIEndpoint, cachePolicy: URLRequest.CachePolicy? = .some(.useProtocolCachePolicy)) -> AnyPublisher<T, APIError> {
+    public func request<T: Codable>(endpoint: APIEndpoint, cachePolicy: URLRequest.CachePolicy? = .some(.useProtocolCachePolicy)) -> AnyPublisher<T, APIError> {
         
         guard let urlRequest = buildURLRequest(endpoint: endpoint, cachePolicy: cachePolicy) else {
             return Fail(error: APIError.unknown(statusCode: -1, message: "Failed to build URL request"))
