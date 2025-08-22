@@ -16,3 +16,4 @@ enum HTTPMethod: String {
     case trace = "TRACE"
     case connect = "CONNECT"
 }
+

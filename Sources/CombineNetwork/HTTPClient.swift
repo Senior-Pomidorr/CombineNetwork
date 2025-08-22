@@ -4,7 +4,7 @@
 import Foundation
 import Combine
 
-final class HTTPClient {
+public final class HTTPClient {
     
     // MARK: - Session configuration
     let configuration = URLSessionConfiguration.default
