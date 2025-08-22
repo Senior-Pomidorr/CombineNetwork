@@ -10,7 +10,7 @@ public final class HTTPClient {
     let configuration = URLSessionConfiguration.default
     let session: URLSession
     
-    init() {
+    public init() {
         self.session = URLSession(configuration: configuration)
     }
     
