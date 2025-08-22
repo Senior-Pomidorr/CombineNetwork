@@ -37,9 +37,10 @@ public final class HTTPClient {
             .eraseToAnyPublisher()
     }
     
-     func buildURLRequest(endpoint: APIEndpoint, cachePolicy: URLRequest.CachePolicy? = .some(.useProtocolCachePolicy)) -> URLRequest? {
+    @inlinable
+    func buildURLRequest(endpoint: APIEndpoint, cachePolicy: URLRequest.CachePolicy? = .some(.useProtocolCachePolicy)) -> URLRequest? {
         var components = URLComponents()
-         components.scheme = endpoint.scheme.rawValue
+        components.scheme = endpoint.scheme.rawValue
         components.host = endpoint.host
         components.path = endpoint.path
         
@@ -82,7 +83,8 @@ public final class HTTPClient {
         return request
     }
     
-    private func createQueryParameters(endpoint: APIEndpoint) -> [URLQueryItem]? {
+    @inlinable
+    func createQueryParameters(endpoint: APIEndpoint) -> [URLQueryItem]? {
         guard let parameters = endpoint.parameters else { return nil }
         
         let queryItems: [URLQueryItem] = parameters.flatMap { key, value -> [URLQueryItem] in
@@ -107,6 +109,7 @@ public final class HTTPClient {
 @available(macOS 10.15, *)
 extension Publisher where Output == (data: Data, response: URLResponse) {
     
+    @inlinable
     func validateResponse() -> AnyPublisher<Data, Error> {
         self.tryMap { data, response in
             guard let httpResponse = response as? HTTPURLResponse else {

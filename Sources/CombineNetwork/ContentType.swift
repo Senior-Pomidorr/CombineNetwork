@@ -14,7 +14,7 @@ public enum ContentType {
     case plainText
     case custom(String)
     
-    var headerValue: String {
+    public var headerValue: String {
         switch self {
         case .json:
             return "application/json"
